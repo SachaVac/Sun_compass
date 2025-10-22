@@ -5,10 +5,10 @@
 Create real-time system to be installed on mobile robot. System (camera) should be able to follow sun and set an exact location of north. 
 
 # Inputs
-- real time info.
+- real time info
 - GPS location
-- accelerometer, gyroscope - rotation of body
-- camera input of sky (180 deg.) + camera placement on robot body
+- accelerometer
+- camera input of sky (180 deg) + camera placement on robot body
 
 # Hardware needed
 - Control board
@@ -17,11 +17,11 @@ Create real-time system to be installed on mobile robot. System (camera) should 
 - IMU - accelerometer unit
 # Process
 ## Computations
-### Incomes
+### Inputs
 - latitude, longitude
 - time, date
 
-### Outcomes
+### Outputs
 - sun altitude + sun azimuth 
 
 ```python
@@ -45,9 +45,7 @@ x3 = sin(alpha)
 s_w = [x1, x2, x3]
 ```
 
-
-
-[Pysolar library](https://pysolar.readthedocs.io/en/latest/)
+[Pysolar library](https://pysolar.readthedocs.io/en/latest/)__
 [PVLib - solarposition](https://pvlib-python.readthedocs.io/en/stable/reference/solarposition.html)
 ## Vision
 
