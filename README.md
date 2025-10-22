@@ -1,5 +1,5 @@
 # Sun_compass
-- semestral project Winter 2025 by Vaclav Sacha
+- CTU in Prague - Winter 2025 semestral project by Vaclav Sacha
 
 # Task
 Create real-time system to be installed on mobile robot. System (camera) should be able to follow sun and set an exact location of north. 
