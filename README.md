@@ -78,7 +78,8 @@ or <br />
 ### Outputs
 - T_wr - transformation matrix between robot body and ENU system
 [Triad method](https://en.wikipedia.org/wiki/Triad_method)<br />
-Example for robot moving straight p_r = (1 0 0)
+### Example 
+robot moving straight p_r = (1 0 0)
 ```bash
 p_w = T_wr*p_r
 ```
