@@ -73,6 +73,16 @@ u_r from accelerometer unit - needed to measure while robot standing
 or <br />
 [BNO085](https://botland.cz/9dof-imu-senzory/22113-bno085-9-dof-imu-fusion-breakout-3osy-akcelerometr-gyroskop-a-magnetometr-adafruit-4754.html)
 ## Direction
-[Triad method](https://en.wikipedia.org/wiki/Triad_method)
+### Inputs 
+- (s_w s_r u_w u_r) - 4 vectors in 2 coordinate systems (robot/world)
+### Outputs
+- T_wr - transformation matrix between robot body and ENU system
+[Triad method](https://en.wikipedia.org/wiki/Triad_method)<br />
+Example for robot moving straight p_r = (1 0 0)
+```bash
+p_w = T_wr*p_r
+```
+p_w giving robot movement in ENU coordinates
 
-## Connection
+
+
