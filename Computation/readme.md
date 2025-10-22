@@ -1,7 +1,7 @@
 # Sun_compass - Computation
 sun directional vector based on GPS location and world date/time
 
-# torun
+# How to
 set up virtual environment
 
 ```bash
