@@ -76,7 +76,7 @@ or <br />
 ### Inputs 
 - (s_w s_r u_w u_r) - 4 vectors in 2 coordinate systems (robot/world)
 ### Outputs
-- T_wr - transformation matrix between robot body and ENU system
+- T_wr - transformation matrix between robot body and ENU system<br />
 [Triad method](https://en.wikipedia.org/wiki/Triad_method)<br />
 ### Example 
 robot moving straight p_r = (1 0 0)
