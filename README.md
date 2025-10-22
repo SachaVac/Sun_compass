@@ -45,7 +45,7 @@ x3 = sin(alpha)
 s_w = [x1, x2, x3]
 ```
 
-[Pysolar library](https://pysolar.readthedocs.io/en/latest/)__
+[Pysolar library](https://pysolar.readthedocs.io/en/latest/)<br />
 [PVLib - solarposition](https://pvlib-python.readthedocs.io/en/stable/reference/solarposition.html)
 ## Vision
 
