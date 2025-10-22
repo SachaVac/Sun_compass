@@ -48,6 +48,7 @@ s_w = [x1, x2, x3]
 [Pysolar library](https://pysolar.readthedocs.io/en/latest/)<br />
 [PVLib - solarposition](https://pvlib-python.readthedocs.io/en/stable/reference/solarposition.html)
 ## Vision
+[e-con cam](https://www.e-consystems.com/industrial-cameras/ar0234-usb3-global-shutter-camera.asp)
 ### Inputs
 - fisheye cam captured image
 - translation matrix robot_body->camera
