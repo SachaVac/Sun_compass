@@ -48,13 +48,16 @@ s_w = [x1, x2, x3]
 [Pysolar library](https://pysolar.readthedocs.io/en/latest/)<br />
 [PVLib - solarposition](https://pvlib-python.readthedocs.io/en/stable/reference/solarposition.html)
 ## Vision
-[e-con cam](https://www.e-consystems.com/industrial-cameras/ar0234-usb3-global-shutter-camera.asp)
+
 ### Inputs
 - fisheye cam captured image
 - translation matrix robot_body->camera
 ### Outputs
 - vector of direction s_r (robot->sun)
 ### Tetsing set
+[e-con cam](https://www.e-consystems.com/industrial-cameras/ar0234-usb3-global-shutter-camera.asp)<br />
+[Objektiv](https://rpishop.cz/sirokouhle-objektivy/2808-arducam-17mm-f2-m12-objektiv-m25170h12.html?utm_source=google&utm_medium=cpc&utm_campaign=CZ-GS-No%2Funder%20index%20produkty&utm_id=21746766956&gad_source=1&gad_campaignid=21746766956&gbraid=0AAAAApAQKp1C6CxnpAR_PiTUvx5-ZkFq8&gclid=CjwKCAjwgeLHBhBuEiwAL5gNEWODSiVjbud9-QqEhCNyx2jn57uVTvGaEGmp_8_mULWh2CRNvubSbBoCBoIQAvD_BwE)<br />
+
 [Raspberry HQ cam - M12](https://rpishop.cz/mipi-kamerove-moduly/5603-raspberry-pi-hq-camera-m12-mount.html?utm_source=google&utm_medium=cpc&utm_campaign=CZ-PMax-Raspberry%20Pi&utm_id=19691368073&gad_source=1&gad_campaignid=19691725348&gbraid=0AAAAApAQKp0wLMGZbLberkrktuDELLmqT&gclid=CjwKCAjw3tzHBhBREiwAlMJoUi85UexceyijH-CBFHmzGrSzuKT_8Cs40828wSok_U4as8vut44m9RoCqgQQAvD_BwE)<br />
 [Fish eye lens 180 deg](https://botland.cz/objektivy-fotoaparatu-pro-raspberry-pi/17066-objektiv-fisheye-m12-156-mm-s-adapterem-pro-fotoaparat-raspberry-pi-arducam-ln031-5904422378349.html)<br />
 [Rasdpberry pi 5](https://rpishop.cz/raspberry-pi-5/6498-raspberry-pi-5-8gb-ram.html) 
