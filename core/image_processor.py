@@ -88,7 +88,7 @@ def calculate_camsolar(path, show_video=True):
 
     t0=time.time()
     # Try for a few seconds to find the sun
-    while time.time() - t0 < 5.0:
+    while time.time() - t0 < 30.0:
         ok, frame = cap.read()
         if not ok:
             print("ERROR2: cap.read() not working."); 
