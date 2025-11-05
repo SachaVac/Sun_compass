@@ -11,12 +11,12 @@ path = "see3cam_fisheye_calib.npz"
 
 
 if __name__ == "__main__":
-
-    al_w, el_w, s_w = solar_calculation.calculate_solar(date, latitude, longitude)
+    al_w, el_w, s_w = solar_calculation.calculate_solar(date, latitude, longitude)    
+    al_c, el_c, s_c = image_processor.calculate_camsolar(path, True)
     
-    image_processor.calculate_camsolar(path)
-    
+    u_w = [0, 0, 1]
+    u_c = [0, 0, 1]
 
-    print(al_w, el_w, s_w)
+    print(al_w, el_w, s_w, al_c, el_c, s_c)
 
 

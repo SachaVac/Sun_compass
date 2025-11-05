@@ -31,17 +31,12 @@ def find_sun_uv(frame, hi_pct=99.0):
 
 def uv_to_cam_dir(u, v, K, D):
     pts = np.array([[[u, v]]], dtype=np.float32)
-    
-    # Create a new "ideal" camera matrix for undistortion.
-    # Using the same K but with zero skew is a good practice.
-    K_new = K.copy()
-    K_new[0,1] = 0.0 # Ensure no skew
-
-    und = cv2.fisheye.undistortPoints(pts, K, D, P=K_new)
+    # undistortPoints returns normalized image coordinates (x/z, y/z) when P is not provided.
+    und = cv2.fisheye.undistortPoints(pts, K, D) # R and P are None by default
+    #breakpoint()
     x, y = und[0,0]
-
-    v3 = np.array([x, y, 1.0])
-    v3 /= np.linalg.norm(v3)
+    v3 = np.array([x, y, 1.0]) # The 3D vector in camera coordinates (assuming z=1)
+    v3 /= np.linalg.norm(v3) # Normalize to unit vector
     return v3 
 
 def cam_vec_to_local_az_el(v3):
@@ -53,9 +48,7 @@ def cam_vec_to_local_az_el(v3):
 def calculate_camsolar(path, show_video=True):
     parser = argparse.ArgumentParser()
     parser.add_argument("--npz", default=path)
-    parser.add_argument("--cam", type=int, default=0)
-    parser.add_argument("--width", type=int, default=1920)
-    parser.add_argument("--height", type=int, default=1200)
+    parser.add_argument("--cam", type=int, default=0)    
     parser.add_argument("--fps", type=int, default=30)
     parser.add_argument("--percentile", type=float, default=99.0)
     args, _ = parser.parse_known_args() # Use parse_known_args to avoid conflicts
@@ -67,15 +60,26 @@ def calculate_camsolar(path, show_video=True):
     except NameError:
         pass
 
-    K, D, _ = load_calib(args.npz)
+    K, D, calib_size = load_calib(args.npz)
+    if K is None:
+        print("Could not load calibration file. Exiting.")
+        return None, None, None
+
+    calib_width, calib_height = calib_size
 
     cap = cv2.VideoCapture(args.cam, cv2.CAP_AVFOUNDATION)  # macOS backend
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     cap.set(cv2.CAP_PROP_FOURCC, fourcc)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH,  args.width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, args.height)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH,  calib_width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, calib_height)
     cap.set(cv2.CAP_PROP_FPS,          args.fps)
     cap.set(cv2.CAP_PROP_BUFFERSIZE,   1)
+
+    # Verify that the camera is using the resolution from calibration
+    actual_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    actual_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    if actual_width != calib_width or actual_height != calib_height:
+        raise SystemExit(f"ERROR: Camera is running at {actual_width}x{actual_height}, but calibration is for {calib_width}x{calib_height}.")
 
     if not cap.isOpened():
         raise SystemExit("ERROR1: no cam")
@@ -128,8 +132,8 @@ def calculate_camsolar(path, show_video=True):
     
     cap.release()
     cv2.destroyAllWindows()
-    print("Sun not found.")
-    return None, None, None
+    print("5s done")
+    return az, el, v3
 
 if __name__ == '__main__':
     # Example of how to use the function

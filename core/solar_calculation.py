@@ -3,15 +3,18 @@ import numpy as np
 
 def calculate_solar(date, latitude, longitude):
     alpha = get_altitude(latitude, longitude, date)
-    beta = get_azimuth(latitude, longitude, date)
+    azimuth = get_azimuth(latitude, longitude, date)
 
+    # Convert degrees to radians for numpy trigonometric functions
+    alpha_rad = np.radians(alpha)
+    azimuth_rad = np.radians(azimuth)
 
-    x1 = np.cos(alpha)*np.sin(beta)
-    x2 = np.cos(alpha)*np.sin(beta)
-    x3 = np.sin(alpha)
+    # Correct conversion from spherical (azimuth, altitude) to Cartesian coordinates
+    # Using ENU (East-North-Up) convention
+    x1 = np.cos(alpha_rad) * np.sin(azimuth_rad)  # East
+    x2 = np.cos(alpha_rad) * np.cos(azimuth_rad)  # North
+    x3 = np.sin(alpha_rad)                        # Up
 
-    s_w = [x1, x2, x3]
+    s_w = np.array([x1, x2, x3])
 
-    return alpha, beta, s_w
-
-
+    return alpha, azimuth, s_w

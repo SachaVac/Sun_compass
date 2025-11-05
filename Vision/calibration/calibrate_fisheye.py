@@ -41,11 +41,16 @@ if not objpoints:
 
 K = np.zeros((3,3))
 D = np.zeros((4,1))
+
+# Add calibration flags for better stability and accuracy
+calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC | cv2.fisheye.CALIB_FIX_SKEW | cv2.fisheye.CALIB_FIX_PRINCIPAL_POINT
+
 rms, _, _, _, _ = cv2.fisheye.calibrate(
     objpoints, imgpoints, img_shape, K, D, None, None,
-    cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC,
+    calibration_flags,
     (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 1e-6)
 )
+
 print("RMS:", rms)
 print("K=\n", K)
 print("D=\n", D)
