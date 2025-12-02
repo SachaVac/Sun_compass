@@ -31,18 +31,19 @@ def find_sun_uv(frame, hi_pct=99.0):
 
 def uv_to_cam_dir(u, v, K, D):
     pts = np.array([[[u, v]]], dtype=np.float32)
-    # undistortPoints returns normalized image coordinates (x/z, y/z) when P is not provided.
-    und = cv2.fisheye.undistortPoints(pts, K, D) # R and P are None by default
-    #breakpoint()
+    # P=K zajistí, že výstup je v camera coordinates
+    und = cv2.fisheye.undistortPoints(pts, K, D, P=K)
     x, y = und[0,0]
-    v3 = np.array([x, y, 1.0]) # The 3D vector in camera coordinates (assuming z=1)
-    v3 /= np.linalg.norm(v3) # Normalize to unit vector
-    return v3 
+    # invert Y (obraz y dolů → fyzika y nahoru)
+    y = -y
+    v3 = np.array([x, y, 1.0])
+    v3 /= np.linalg.norm(v3)
+    return v3
 
 def cam_vec_to_local_az_el(v3):
     x, y, z = v3
-    az = math.degrees(math.atan2(x, z))    
-    el = math.degrees(math.asin(-y))      
+    az = math.degrees(math.atan2(x, z))
+    el = math.degrees(math.atan2(y, math.sqrt(x*x + z*z)))
     return az, el
 
 def calculate_camsolar(path, show_video=True):
@@ -88,7 +89,7 @@ def calculate_camsolar(path, show_video=True):
 
     t0=time.time()
     # Try for a few seconds to find the sun
-    while time.time() - t0 < 30.0:
+    while True:#time.time() - t0 < 30.0:
         ok, frame = cap.read()
         if not ok:
             print("ERROR2: cap.read() not working."); 
@@ -121,10 +122,10 @@ def calculate_camsolar(path, show_video=True):
 
             cv2.putText(overlay, status, (20,40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,255,0), 2, cv2.LINE_AA)
             mh, mw = 240, 320
-            if mask is not None:
-                m3 = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-                m3r = cv2.resize(m3, (mw, mh))
-                overlay[0:mh, 0:mw] = m3r
+            # if mask is not None:
+            #     m3 = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+            #     m3r = cv2.resize(m3, (mw, mh))
+            #     overlay[0:mh, 0:mw] = m3r
 
             cv2.imshow("Sun detector", overlay)
             k = cv2.waitKey(1) & 0xFF

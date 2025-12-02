@@ -2,7 +2,7 @@ import cv2, time, os
 
 # parametry
 cam_index = 0
-out_dir = "calib_images"
+out_dir = "calib_images_new"
 os.makedirs(out_dir, exist_ok=True)
 
 cap = cv2.VideoCapture(cam_index, cv2.CAP_AVFOUNDATION)

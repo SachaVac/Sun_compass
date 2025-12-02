@@ -54,6 +54,9 @@ def calculate_camsolar(calib_path, image_path_pattern, show_video=True):
     :param image_path_pattern: Vzor cesty pro načítání obrázků (např. '/data/img*.jpeg').
     :param show_video: Zda zobrazovat výsledky v okně.
     """
+
+    T = 0
+    F = 0
     parser = argparse.ArgumentParser()
     parser.add_argument("--npz", default=calib_path)
     parser.add_argument("--percentile", type=float, default=99.0)
@@ -127,10 +130,15 @@ def calculate_camsolar(calib_path, image_path_pattern, show_video=True):
             # Pokud chceme, aby se zobrazil každý obrázek dokud stiskneme klávesu: cv2.waitKey(0)
             k = cv2.waitKey(1) & 0xFF 
             input()
+            if input()=="t":
+                T +=1
+            else:
+                F +=1
             if k in (27, ord('q')): break
 
     cv2.destroyAllWindows()
     print("Processing finished.")
+    print(f"T: {T}, F: {F}")
     # Vrátí výsledky z posledního zpracovaného snímku
     return az, el, v3
 
