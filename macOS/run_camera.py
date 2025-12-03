@@ -1,26 +1,8 @@
-from pysolar.solar import *
-import datetime
-import numpy as np
 import cv2
+import numpy as np
 import sys
 from pathlib import Path
 import time
-
-
-date = datetime.datetime(2025, 10, 22, 8, 00, 1, tzinfo=datetime.timezone.utc) # set time and date - datetime.datetime( YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, mikrosecond, tzinfo=...)
-alpha = get_altitude(latitude, longitude, date)
-beta = get_azimuth(latitude, longitude, date)
-
-
-x1 = np.cos(alpha)*np.sin(beta)
-x2 = np.cos(alpha)*np.sin(beta)
-x3 = np.sin(alpha)
-
-s_w = np.array([x1, x2, x3])
-s_w/= np.linalg.norm(s_w)
-
-print(s_w)
-
 
 def open_calibrationIMG (path): #load calibration of FISHEYE
     data = np.load(path)
@@ -270,12 +252,6 @@ def open_data(calib_path, data_path):
     return
 
 if __name__ == "__main__":
-    latitude = 50.73235690065898 # set your coordinates
-    longitude = 15.782290488599608
-    date = datetime.datetime(2025, 10, 22, 8, 00, 1, tzinfo=datetime.timezone.utc) # set time and date - datetime.datetime( YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, mikrosecond, tzinfo=...)
-
-
-
     calib_path = "fisheye_calib.npz"
     data_path = "data/IMG*.jpeg" 
     cam_index = 0

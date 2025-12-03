@@ -46,7 +46,7 @@ def infere_w_calib():
 def capture_from_cam(calib_path, index):
     K, D, (w,h)  = open_calibrationIMG(calib_path) #get calibration numbers
     print (f"camres {w}x{h}")
-    cam = cv2.VideoCapture(index, cv2.CAP_AVFOUNDATION)
+    cam = cv2.VideoCapture(index, cv2.CAP_V4L2)
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, w)
     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
     cam.set(cv2.CAP_PROP_FPS, 30)
@@ -254,7 +254,7 @@ def open_data(calib_path, data_path):
 if __name__ == "__main__":
     calib_path = "fisheye_calib.npz"
     data_path = "data/IMG*.jpeg" 
-    cam_index = 0
+    cam_index = 2 #on my ubuntu running at index 2
     
 
     while True:
