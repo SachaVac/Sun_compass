@@ -107,7 +107,7 @@ def main():
     
     # HW DEPENDENCIES
     calib_path = "fisheye_calib.npz" 
-    cam_index = 3 
+    cam_index = 2 
     
     # IMPORT CALIBRATION
     K, D, (w, h)  = open_calibrationIMG(calib_path)

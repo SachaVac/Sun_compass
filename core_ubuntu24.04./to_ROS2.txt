@@ -1,0 +1,52 @@
+Dobry den.
+
+Nas balicek s magnetickym kompasem: https://github.com/herolada/compass-ros2 .
+
+Proctete readmes v hlavni slozce, compass_interfaces a magnetometer_compass . Snad z toho bude nejak jasnejsi, jak soucasny interface vypada.
+
+Postup s vytvarenim balicku by mohl byt (vypada to, ze je toho hodne, ale vetsina jsou jen rady, ktere vam snad usetri nejaky cas nebo slepe ulicky; klidne muzete postupovat jinak):
+
+    Nainstalujte ROS 2 Jazzy (pokud jedete na Macu, tak bud do dockeru nebo do virtualniho stroje (https://mac.getutm.app/); jako zaklad zvolte Ubuntu 24.04; nemam moc zkusenosti, jak je to s predavanim HW kamery do virtualu/dockeru, als snad to nejak pujde).
+    vytvorte colcon ros2 workspace
+    do slozky src v nem naklonujte https://github.com/herolada/compass-ros2 (pro jednoduchost muzete ve vsech adresarich krom compass_interfaces vytvorit prazdny soubor COLCON_IGNORE, aby se balicky nebuildily)
+    ve slozce src pak vytvorte vas balicek, treba sun_compass nebo celestial_compass (pokud verite, ze casem pridate i sledovani Mesice :) )
+        bud podle klasicke dokumentace, nebo jsou nastroje https://github.com/Jannkar/turtle_nest nebo https://discourse.openrobotics.org/t/introducing-ros2-pkg-create-new-powerful-ros-2-package-generator/40669.
+        Pro jednoduchost zvolte build type ament_python (Python balicek) , ktery konfiguruje balicek podle setup.py .
+    Do package.xml vaseho balicku pridejte zavislost <exec_depend>compass_interfaces</exec_depend> .
+    Pak vytvorte node, ktery bude delat samotny vypocet:
+        bude subscribovat topic "sun_camera/image_raw" typu "sensor_msgs/Image"
+            cteni z kamery v tomto nodu nedelejte
+            pro prevedeni z ROS Image formatu do OpenCV formatu pouzijte cv_bridge: https://stackoverflow.com/q/72690021/1076564 .
+        bude subscribovat topic "fix" typu "sensor_msgs/NavSatFix"
+        bude subscribovat TF ( https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Tf2/Writing-A-Tf2-Listener-Py.html )
+        TF frame kompasu by se mohl jmenovat treba "sun_compass".
+        TF frame robota se jmenuje "base_link"
+        TF frame, ze ktereho zjistite orientaci robota, se jmenuje "odom" (tj. hledate transformaci sun_compass -> odom, ktera vam rekne orientaci vaseho modulu v souradnem systemu zarovnanem s gravitaci).
+            budete potrebovat buffer.lookup_transform() ( https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Tf2/Writing-A-Tf2-Listener-Py.html )
+            lookup_transform() ma i argument timeout, ten nastavte treba na 0.2 vteriny (defaultni 0 je vetsinou nevhodna)
+            ze ziskane transformace si v transform.orientation prectete orientaci modulu vuci vodorvnemu framu (jako quaternion)
+            quaternion muzete kdyztak prevest na roll/pitch/yaw nebo numpy rotacni matici pomoci knihovny https://index.ros.org/p/tf_transformations/ .
+        cas, ke kteremu pocitate polohu slunce, nezjistujte pomoci time.time(), ale pomoci self.get_clock().now() (aby to fungovalo spravne i v simulaci a pri prehravani zaznamu). Pokud vite, jaky je delay kamery (tj. cas uplynuly od zacatku snimani po zavolani callbacku v kodu), muzete ho od aktualniho casu odecist. Ale zatim to neni nutne resit.
+        publikujte zpravu na topic "sun_compass/true/enu/rad" typu "compass_interfaces/Azimuth" . Azimut by mel byt v ENU framu orientovanem ke geografickemu severu, v radianech. Do "header.frame_id" zpravy dejte TF frame kompasu, tj. "sun_compass". Do "header.stamp" dejte cas z predchoziho kroku (ulozeny, nikoli ziskany novym volanim now() ).
+        Az budete mit hotovo, zkuste vsechny zavislosti vaseho kodu najit na https://index.ros.org/#jazzy a dejte je do package.xml (a pripadne i do setup.py). Nektere baliky vam to asi najde ve variante python3-balicek, to je v poradku pro package.xml, ale do setup.py jde jen "balicek".
+    Cteni z kamery nemusite psat, postara se o nej balicek https://index.ros.org/p/usb_cam/#jazzy .
+    Vytvorte launch file "sun_compass.launch", ktery spusti vas node a driver kamery
+    zbuildete a sourcnete workspace ("colcon build --symlink-install" a pak "source install/setup.bash")
+    Pro otestovani:
+        Vytvorte dalsi node, ktery bude publikovat potrebne udaje, tj. GPS fix.
+        Transformace odom->base_link a base_link->sun_compass pro jednoduchost muzete publikovat pomoci tf2_ros static_transform_publisher .
+        Pokud budete chtit testovat na nejakych datech ze zaznamu, nahrajte nebo vytvorte si bag file, ve kterem budou ulozene obrazky z topicu sun_comass/image_raw a muzete pak prehravat pomoci ros2 bag play.
+
+Nastrel toho launch file sun_compass.launch:
+
+<launch>
+    <node pkg="sun_compass" exec="compass_node" name="sun_compass" output="screen">
+    </node>
+    <node pkg="usb_cam" exec="usb_cam_node_exe" name="sun_camera_driver" namespace="sun_camera" output="screen">
+        <param name="pixel_format" value="yuyv2rgb" />
+    </node>
+</launch>
+
+Take bych doporucil mit samotnou funkcionalitu vypoctu v separatnim Python modulu bez ROS zavislosti, a pak vedle toho jen "ROS wrapper", ktery ziska a prevede vsechna data na potrebny Python format a pak pouzije modul pro vypocet. Lepe se tim oddeli ulohy jednotlivych casti kodu.
+
+Az vam to bude nejak zakladne fungovat, muzete zkusit pridat interpretaci kalibracni matice a zkresleni kamery, at se nemusi pouzivat nejake zafixovane hodnoty v kodu. Pokud je kamera zkalibrovana, na topicu "/sun_compass/camera_info" se publikuji kalibracni data. Ta je mozne interpretovat knihovnou https://index.ros.org/p/image_geometry/ . Bohuzel jeji Python verze nepodporuje fisheye kamery (distortion_model EQUIDISTANT), ale je mozne jen obslehnout prislusna opencv volani z C++ verze: https://github.com/ros-perception/vision_opencv/blob/27de9ecf9862e6fba509b7e49e3c2511c7d11627/image_geometry/src/pinhole_camera_model.cpp#L389 . Pokud uz kalibracni matici mate, staci ji prepsat do formatu https://github.com/ros-drivers/usb_cam/blob/main/config/camera_info.yaml . Pak usb_cam driveru predate parametr "camera_info_url:=file:///cesta/ke/camera_info.yaml" a driver by mel sam zacit camera_info zpravy vytvaret.
